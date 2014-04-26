@@ -3,20 +3,19 @@
 
 (def page-size 2)
 
-(defn total-archives
+(defn total-pages
   [queue]
-  (prn "total-achives" queue)
-  (quot (event/total queue) page-size))
+  (quot (- (event/total queue) 1) page-size))
 
-(defn archive-number
-  [queue archive]
-  (if (nil? archive)
-    (total-archives queue)
-    (Integer/parseInt archive)))
+(defn current-page
+  [page total-pages]
+  (if (nil? page)
+    total-pages
+    (Integer/parseInt page)))
 
 (defn display
-  [queue & [archive]]
-  (prn "ARCHIVE" (or archive (total-archives queue)))
-  (let [archive (archive-number queue archive)]
+  [queue & [page]]
+  (let [total (total-pages queue)
+        current (current-page page total)]
     {:queue queue
-     :items (map event/display (event/get-page queue archive page-size))}))
+     :items (map event/display (event/get-page queue current page-size))}))
