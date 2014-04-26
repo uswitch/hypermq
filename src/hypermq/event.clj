@@ -25,6 +25,10 @@
   (when-let [e (@events (dec (Integer/parseInt id)))]
     {::event e}))
 
-(defn get-all
-  []
-  @events)
+(defn total
+  [queue]
+  (count @events))
+
+(defn get-page
+  [queue page page-size]
+  (nth (partition page-size page-size nil @events) page))

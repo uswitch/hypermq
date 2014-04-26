@@ -6,7 +6,13 @@
             [hypermq.queue :as queue]
             [hypermq.event :as event]))
 
-(defresource list-events
+(defresource archive-events
+  [queue archive]
+  :available-media-types ["application/json" "application/hal+json"]
+  :allowed-methods [:get]
+  :handle-ok (fn [_] (queue/display queue archive)))
+
+(defresource recent-events
   [queue]
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods [:get :post]
@@ -25,7 +31,8 @@
 
 (defroutes app-routes
   (GET "/" [] "Home Page")
-  (ANY "/q/:queue" [queue] (list-events queue))
+  (ANY "/q/:queue" [queue] (recent-events queue))
+  (ANY "/q/:queue/:archive" [queue archive] (archive-events queue archive))
   (ANY "/e/:id" [id] (event id))
   (route/resources "/")
   (route/not-found "Not Found"))
