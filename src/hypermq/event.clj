@@ -20,12 +20,11 @@
   [event]
   (merge event {:link (build-url (event :id))}))
 
-(defn display-all
-  [queue]
-  {:queue queue :items (map display @events)})
-
 (defn find-by
   [id]
-  (prn "find-by" id " in " @events)
   (when-let [e (@events (dec (Integer/parseInt id)))]
     {::event e}))
+
+(defn get-all
+  []
+  @events)
