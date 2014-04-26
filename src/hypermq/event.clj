@@ -18,7 +18,7 @@
 
 (defn display
   [event]
-  (merge event {:link (build-url (event :id))}))
+  (merge event {:_links {:self {:href (build-url (event :id))}}}))
 
 (defn find-by
   [id]
