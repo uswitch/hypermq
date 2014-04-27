@@ -20,13 +20,18 @@ You will need [Leiningen][3] 1.7.0 or above installed.
 
 [3]: https://github.com/technomancy/leiningen
 
-You will need [sqlite][4] installed. `brew install sqlite`
+You will need [sqlite][4] installed.
 
 [4]: https://sqlite.org
 
 ## Setup
 
-Create sqlite database `development.db` and create tables as shown in `sql/create-tables.sql` 
+Create sqlite database `development.db` and create tables as shown in `sql/create-tables.sql`
+
+```bash
+brew install sqlite
+sqlite3 development.db < sql/create-tables.sql
+```
 
 ## Running
 
