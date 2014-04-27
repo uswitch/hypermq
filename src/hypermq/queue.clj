@@ -23,14 +23,14 @@
   (format "http://localhost:3000/q/%s/%s" queue page))
 
 (defn build-links
-  [queue current total]
-  (cond-> {:self {:href (build-url queue current)}}
+  [queue current-page total-pages]
+  (cond-> {:self {:href (build-url queue current-page)}}
 
-          (< current total)
-          (merge {:next {:href (build-url queue (inc current))}})
+          (< current-page total-pages)
+          (merge {:next {:href (build-url queue (inc current-page))}})
 
-          (< 0 current)
-          (merge {:prev {:href (build-url queue (dec current))}})))
+          (< 0 current-page)
+          (merge {:prev {:href (build-url queue (dec current-page))}})))
 
 (defn display
   [queue & [page]]

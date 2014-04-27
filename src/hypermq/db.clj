@@ -1,21 +1,7 @@
 (ns hypermq.db
   (:require [korma.core :refer :all]
             [korma.db :refer [defdb sqlite3]]
-            [clj-time.core :as t]
-            [clj-time.coerce :as c]
-            [clojure.tools.reader :as edn]))
-
-(defn serialize [x]
-  (pr-str x))
-
-(defn de-serialize [x]
-  (edn/read-string x))
-
-(defn mutate-row [key mutate-fn]
-  (fn [{value key :as row}]
-    (if value
-      (assoc row key (mutate-fn value))
-      row)))
+            [hypermq.util :as util]))
 
 (defdb db (sqlite3 {:db "development.db"}))
 
@@ -26,11 +12,8 @@
 
 (defentity event
   (belongs-to queue {:fk :queue-id})
-  (prepare (mutate-row :content serialize))
-  (transform (mutate-row :content de-serialize)))
-
-(defn timestamp [] (c/to-long (t/now)))
-(defn uuid [] (str (java.util.UUID/randomUUID)))
+  (prepare (util/mutate-row :content util/serialize))
+  (transform (util/mutate-row :content util/de-serialize)))
 
 (defn get-event
   [selector]
@@ -67,7 +50,7 @@
 (defn insert-queue
   [title]
   (last-insert-id
-   (insert queue (values {:title title :uuid (uuid)}))))
+   (insert queue (values {:title title :uuid (util/uuid)}))))
 
 (defn find-or-create-queue
   [title]
@@ -79,9 +62,9 @@
 (defn insert-event
   [queue-id title author content]
   (last-insert-id (insert event
-                          (values {:uuid (uuid)
+                          (values {:uuid (util/uuid)
                                    :queue_id queue-id
                                    :title title
                                    :author author
                                    :content content
-                                   :created (timestamp)}))))
+                                   :created (util/timestamp)}))))
