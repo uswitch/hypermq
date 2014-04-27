@@ -1,17 +1,14 @@
 (ns hypermq.event
-  (:require [clj-time.core :as t]
-            [clj-time.coerce :as c]))
-
-(defn timestamp [] (c/to-long (t/now)))
-
-(defonce events (ref [{:id 1 :timestamp (timestamp) :author "Christian" :body "foo"}]))
+  (:require [hypermq.db :as db]))
 
 (defn create
-  [context]
-  (dosync
-   (let [next-id (inc (count @events))]
-     (alter events conj {:id next-id :timestamp (timestamp)})
-     {::id next-id})))
+  [context queue]
+  (let [queue-id (db/find-or-create-queue queue)]
+    {::id  (db/insert-event
+            queue-id
+            (context :title)
+            (context :author)
+            (context :content))}))
 
 (defn build-url [id]
   (format "http://localhost:3000/e/%s" id))
@@ -21,14 +18,13 @@
   (merge event {:_links {:self {:href (build-url (event :id))}}}))
 
 (defn find-by
-  [id]
-  (when-let [e (@events (dec (Integer/parseInt id)))]
-    {::event e}))
+  [uuid]
+  (db/find-event uuid))
 
 (defn total
   [queue]
-  (count @events))
+  (db/event-count queue))
 
 (defn get-page
   [queue page page-size]
-  (nth (partition page-size page-size nil @events) page))
+  (db/get-events queue page page-size))

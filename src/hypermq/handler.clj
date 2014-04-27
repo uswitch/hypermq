@@ -16,7 +16,7 @@
   [queue]
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods [:get :post]
-  :post! event/create
+  :post! #(event/create % queue)
   :post-redirect? true
   :location (fn [context] (event/build-url (:hypermq.event/id context)))
   :handle-ok (fn [_] (queue/display queue)))
