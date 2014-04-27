@@ -1,22 +1,28 @@
 (ns hypermq.queue
-  (:require [hypermq.event :as event]
+  (:require [hypermq.event :as msg]
             [hypermq.db :as db]))
 
 (def page-size 2)
 
 (defn total-pages
   [queue]
-  (quot (- (event/total queue) 1) page-size))
-
-(defn find-by
-  [title]
-  (db/find-queue title))
+  (quot (- (msg/total queue) 1) page-size))
 
 (defn current-page
   [page total-pages]
   (if (nil? page)
     total-pages
     (Integer/parseInt page)))
+
+(defn find-by
+  [queue-title & [page]]
+  (when-let [queue (db/find-queue queue-title)]
+    (let [total (total-pages queue-title)
+          current (current-page page total)
+          messages (msg/get-page queue-title current page-size)]
+      (merge queue {:messages messages
+                    :current-page current
+                    :total-pages total}))))
 
 (defn build-url
   [queue page]
@@ -33,9 +39,8 @@
           (merge {:prev {:href (build-url queue (dec current-page))}})))
 
 (defn display
-  [queue & [page]]
-  (let [total (total-pages queue)
-        current (current-page page total)]
-    {:queue queue
-     :_links (build-links queue current total)
-     :_embedded {:event (map event/display (event/get-page queue current page-size))}}))
+  [{:keys [title uuid messages current-page total-pages]}]
+  {:queue title
+   :uuid uuid
+   :_links (build-links title current-page total-pages)
+   :_embedded {:message (map msg/display messages)}})

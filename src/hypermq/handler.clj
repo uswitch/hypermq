@@ -4,39 +4,44 @@
             [compojure.route     :as route]
             [liberator.core      :refer [defresource]]
             [hypermq.queue       :as queue]
-            [hypermq.event       :as event]
+            [hypermq.event       :as msg]
             [hypermq.json        :as js]))
 
-(defresource archive-events
-  [queue archive]
+(defresource archive-messages
+  [queue-title archive]
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods [:get]
-  :handle-ok (fn [_] (queue/display queue archive)))
+  :exists? (fn [_]
+             (when-let [items (queue/find-by queue-title archive)]
+               {:items items}))
+  :handle-ok (fn [context] (queue/display (context :items))))
 
-(defresource recent-events
+(defresource recent-messages
   [queue-title]
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods [:get :post]
-  :exists? (fn [_] (queue/find-by queue-title))
+  :exists? (fn [_]
+             (when-let [items (queue/find-by queue-title)]
+               {:items items}))
   :malformed? js/parse-body
-  :post! (fn [context] (event/create queue-title (context :data)))
+  :post! (fn [context] (msg/create queue-title (context :data)))
   :post-redirect? true
-  :location (fn [context] (event/build-url (context :hypermq.event/item)))
-  :handle-ok (fn [_] (queue/display queue-title)))
+  :location (fn [context] (msg/build-url (context :hypermq.event/item)))
+  :handle-ok (fn [context] (queue/display (context :items))))
 
-(defresource event
+(defresource message
   [uuid]
   :allowed-methods [:get]
   :available-media-types ["application/json" "application/hal+json"]
-  :exists? (fn [_] (event/find-by uuid))
-  :handle-ok (fn [context] (event/display (context :hypermq.event/item)))
+  :exists? (fn [_] (msg/find-by uuid))
+  :handle-ok (fn [context] (msg/display (context :hypermq.event/item)))
   :handle-not-found "Event not found!")
 
 (defroutes app-routes
   (GET "/" [] "Home Page")
-  (ANY "/q/:queue" [queue] (recent-events queue))
+  (ANY "/q/:queue" [queue] (recent-messages queue))
   (ANY "/q/:queue/:archive" [queue archive] (archive-events queue archive))
-  (ANY "/e/:uuid" [uuid] (event uuid))
+  (ANY "/m/:uuid" [uuid] (message uuid))
   (route/resources "/")
   (route/not-found "Not Found"))
 

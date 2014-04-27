@@ -12,7 +12,7 @@
     {::item (db/get-event {:id event-id})}))
 
 (defn build-url [event]
-  (format "http://localhost:3000/e/%s" (event :uuid)))
+  (format "http://localhost:3000/m/%s" (event :uuid)))
 
 (defn display
   [event]
