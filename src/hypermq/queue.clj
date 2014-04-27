@@ -14,6 +14,10 @@
     total-pages
     (Integer/parseInt page)))
 
+(defn etag
+  [{:keys [messages] :as q}]
+  (-> messages first :uuid))
+
 (defn find-by
   [queue-title & [page]]
   (when-let [queue (db/find-queue queue-title)]

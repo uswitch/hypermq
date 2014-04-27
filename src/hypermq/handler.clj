@@ -14,6 +14,7 @@
   :exists? (fn [_]
              (when-let [items (queue/find-by queue-title archive)]
                {:items items}))
+  :etag (fn [context] (queue/etag (context :items)))
   :handle-ok (fn [context] (queue/display (context :items))))
 
 (defresource recent-messages
@@ -23,6 +24,7 @@
   :exists? (fn [_]
              (when-let [items (queue/find-by queue-title)]
                {:items items}))
+  :etag (fn [context] (queue/etag (context :items)))
   :malformed? js/parse-body
   :post! (fn [context] (msg/create queue-title (context :data)))
   :post-redirect? true

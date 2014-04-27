@@ -68,3 +68,12 @@ Each json message body looks as follows. All are optional (title, author, conten
 
 `curl -v -d '{"title":"my message","author":"xian","content":{"some":"data"}}' -H "Content-Type:application/json" http://localhost:3000/q/myqueue`
 
+## Etags
+
+When you view a queue, an ETAG header will be returned indicating the state of the queue.  This can later be used to make use of cached responses. If the ETAG has unchanged since the last view then a 304 Not Modified will be returned.
+
+ETAGs are used by providing the value in the If-None-Match header.
+
+```bash
+curl -i -H 'Content-Type:application/json' -H 'If-None-Match:"ca9539ef-4763-4940-8565-e7699c1404da"' http://localhost:3000/q/data
+```
