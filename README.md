@@ -8,9 +8,9 @@ You will need [Leiningen][1] 1.7.0 or above installed.
 
 [1]: https://github.com/technomancy/leiningen
 
-You will need [sqlite3][2] installed. `brew install sqlite3`
+You will need [sqlite][2] installed. `brew install sqlite`
 
-[2]: http://sqlite3.org
+[2]: https://sqlite.org
 
 ## Setup
 
