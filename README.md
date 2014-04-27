@@ -46,7 +46,11 @@ Method | URI | Action
 GET | /q/:name | Lists the most recent events for QUEUE :name
 POST | /q/:name | Create a new message on QUEUE :name
 GET | /q/:name/:page | Lists archived events for QUEUE :name for PAGE :page
-GET | /e/:uuid | Shows details for an EVENT with :uuid
+GET | /m/:uuid | Shows details for an EVENT with :uuid
+
+#### Note on queue creation
+
+When POSTing to a queue, as well as creating the message it will also create the queue if one does not already exist.
 
 ### Message body details
 
@@ -62,5 +66,5 @@ Each json message body looks as follows. All are optional (title, author, conten
 
 ### Example message creation
 
-`curl -v -d '{"title":"my event","author":"xian","content":{"some":"data"}}' -H "Content-Type:application/json" http://localhost:3000/q/myqueue`
+`curl -v -d '{"title":"my message","author":"xian","content":{"some":"data"}}' -H "Content-Type:application/json" http://localhost:3000/q/myqueue`
 
