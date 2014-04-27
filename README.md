@@ -1,16 +1,28 @@
 # hypermq
 
-A JSON hypermedia based message queue. Inspired by the AtomPub messaging as described in Rest in Practice
+A JSON hypermedia based message queue. Inspired by the AtomPub messaging as described in [Rest in Practice][1]. Have opted for the leaner [json+hal][2] media type over the more heavy weight Atom.
+
+[1]: http://restinpractice.com/book/
+[2]: http://stateless.co/hal_specification.html 
+
+### Hypermq is...
+
+* persistent messages 
+* durable queue
+* restful
+* *not* distributed
+* *not* low latency
+* *not* high throughput
 
 ## Prerequisites
 
-You will need [Leiningen][1] 1.7.0 or above installed.
+You will need [Leiningen][3] 1.7.0 or above installed.
 
-[1]: https://github.com/technomancy/leiningen
+[3]: https://github.com/technomancy/leiningen
 
-You will need [sqlite][2] installed. `brew install sqlite`
+You will need [sqlite][4] installed. `brew install sqlite`
 
-[2]: https://sqlite.org
+[4]: https://sqlite.org
 
 ## Setup
 
