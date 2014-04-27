@@ -31,6 +31,18 @@ POST | /q/:name | Create a new message on QUEUE :name
 GET | /q/:name/:page | Lists archived events for QUEUE :name for PAGE :page
 GET | /e/:uuid | Shows details for an EVENT with :uuid
 
+### Message body details
+
+Each json message body looks as follows. All are optional (title, author, content)
+
+```json
+{
+  "title":"the title of the event",
+  "author","the message creator",
+  "content", { "some":"custom data", "can":"contain any json" }
+}
+```
+
 ### Example message creation
 
 `curl -v -d '{"title":"my event","author":"xian","content":{"some":"data"}}' -H "Content-Type:application/json" http://localhost:3000/q/myqueue`
