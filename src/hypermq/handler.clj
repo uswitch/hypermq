@@ -23,10 +23,10 @@
   :handle-ok (fn [_] (queue/display queue-title)))
 
 (defresource event
-  [id]
+  [uuid]
   :allowed-methods [:get]
   :available-media-types ["application/json" "application/hal+json"]
-  :exists? (fn [_] (event/find-by id))
+  :exists? (fn [_] (event/find-by uuid))
   :handle-ok (fn [context] (event/display (context :hypermq.event/event)))
   :handle-not-found "Event not found!")
 
@@ -34,7 +34,7 @@
   (GET "/" [] "Home Page")
   (ANY "/q/:queue" [queue] (recent-events queue))
   (ANY "/q/:queue/:archive" [queue archive] (archive-events queue archive))
-  (ANY "/e/:id" [id] (event id))
+  (ANY "/e/:uuid" [uuid] (event uuid))
   (route/resources "/")
   (route/not-found "Not Found"))
 

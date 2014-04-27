@@ -10,16 +10,16 @@
             (context :author)
             (context :content))}))
 
-(defn build-url [id]
-  (format "http://localhost:3000/e/%s" id))
+(defn build-url [uuid]
+  (format "http://localhost:3000/e/%s" uuid))
 
 (defn display
   [event]
-  (merge event {:_links {:self {:href (build-url (event :id))}}}))
+  (merge event {:_links {:self {:href (build-url (event :uuid))}}}))
 
 (defn find-by
   [uuid]
-  (db/find-event uuid))
+  {::event (db/find-event uuid)})
 
 (defn total
   [queue]
