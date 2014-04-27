@@ -25,10 +25,11 @@ To start a web server for the application, run:
 ### API usage
 
 Method | URI | Action
-GET  | /q/:name | Lists the most recent events for QUEUE :name
+--- | --- | ---
+GET | /q/:name | Lists the most recent events for QUEUE :name
 POST | /q/:name | Create a new message on QUEUE :name
-GET  | /q/:name/:page | Lists archived events for QUEUE :name for PAGE :page
-GET  | /e/:uuid | Shows details for an EVENT with :uuid
+GET | /q/:name/:page | Lists archived events for QUEUE :name for PAGE :page
+GET | /e/:uuid | Shows details for an EVENT with :uuid
 
 ### Example message creation
 
