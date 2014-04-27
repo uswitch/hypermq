@@ -15,8 +15,13 @@
     (Integer/parseInt page)))
 
 (defn etag
-  [{:keys [messages] :as q}]
+  [{:keys [messages]}]
   (-> messages first :uuid))
+
+(defn last-modified
+  [{:keys [messages]}]
+  (prn "LAST-MODIFIED" (-> messages first :created))
+  (-> messages first :created))
 
 (defn find-by
   [queue-title & [page]]
