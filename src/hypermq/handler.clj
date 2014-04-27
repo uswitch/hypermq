@@ -1,10 +1,29 @@
 (ns hypermq.handler
   (:use compojure.core)
   (:require [compojure.handler :as handler]
-            [compojure.route :as route]
-            [liberator.core :refer [defresource]]
-            [hypermq.queue :as queue]
-            [hypermq.event :as event]))
+            [compojure.route   :as route]
+            [liberator.core    :refer [defresource]]
+            [hypermq.queue     :as queue]
+            [hypermq.event     :as event]
+            [clojure.java.io   :as io]
+            [clojure.data.json :as json]))
+
+(defn body-as-string [ctx]
+  (if-let [body (get-in ctx [:request :body])]
+    (condp instance? body
+      java.lang.String body
+      (slurp (io/reader body)))))
+
+(defn parse-json [context]
+  (when (#{:put :post} (get-in context [:request :request-method]))
+    (try
+      (if-let [body (body-as-string context)]
+        (let [data (json/read-str body :key-fn keyword)]
+          [false {:data data}])
+        {:message "No body"})
+      (catch Exception e
+        (.printStackTrace e)
+        {:message (format "IOException: " (.getMessage e))}))))
 
 (defresource archive-events
   [queue archive]
@@ -17,9 +36,10 @@
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods [:get :post]
   :exists? (fn [_] (queue/find-by queue-title))
-  :post! #(event/create % queue-title)
+  :malformed? parse-json
+  :post! (fn [context] (event/create queue-title (context :data)))
   :post-redirect? true
-  :location (fn [context] (event/build-url (:hypermq.event/id context)))
+  :location (fn [context] (event/build-url (context :hypermq.event/item)))
   :handle-ok (fn [_] (queue/display queue-title)))
 
 (defresource event
@@ -27,7 +47,7 @@
   :allowed-methods [:get]
   :available-media-types ["application/json" "application/hal+json"]
   :exists? (fn [_] (event/find-by uuid))
-  :handle-ok (fn [context] (event/display (context :hypermq.event/event)))
+  :handle-ok (fn [context] (event/display (context :hypermq.event/item)))
   :handle-not-found "Event not found!")
 
 (defroutes app-routes

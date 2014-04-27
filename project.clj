@@ -5,7 +5,9 @@
                  [compojure "1.1.6"]
                  [liberator "0.11.0"]
                  [korma "0.3.0-RC5"]
-                 [clj-time "0.7.0"]]
+                 [clj-time "0.7.0"]
+                 [org.clojure/data.json "0.2.4"]
+                 [org.clojure/tools.reader "0.8.4"]]
   :plugins [[lein-ring "0.8.10"]]
   :ring {:handler hypermq.handler/app}
   :profiles
