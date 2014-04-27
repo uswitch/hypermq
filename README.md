@@ -49,9 +49,9 @@ Each json message body looks as follows. All are optional (title, author, conten
 
 ```json
 {
-  "title":"the title of the event",
-  "author","the message creator",
-  "content", { "some":"custom data", "can":"contain any json" }
+  "title" : "the title of the event",
+  "author" : "the message creator",
+  "content" : { "some":"custom data", "can":"contain any json" }
 }
 ```
 
