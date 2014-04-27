@@ -1,11 +1,16 @@
 (ns hypermq.queue
-  (:require [hypermq.event :as event]))
+  (:require [hypermq.event :as event]
+            [hypermq.db :as db]))
 
 (def page-size 2)
 
 (defn total-pages
   [queue]
   (quot (- (event/total queue) 1) page-size))
+
+(defn find-by
+  [title]
+  (db/find-queue title))
 
 (defn current-page
   [page total-pages]

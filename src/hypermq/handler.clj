@@ -13,13 +13,14 @@
   :handle-ok (fn [_] (queue/display queue archive)))
 
 (defresource recent-events
-  [queue]
+  [queue-title]
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods [:get :post]
-  :post! #(event/create % queue)
+  :exists? (fn [_] (queue/find-by queue-title))
+  :post! #(event/create % queue-title)
   :post-redirect? true
   :location (fn [context] (event/build-url (:hypermq.event/id context)))
-  :handle-ok (fn [_] (queue/display queue)))
+  :handle-ok (fn [_] (queue/display queue-title)))
 
 (defresource event
   [id]
