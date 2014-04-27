@@ -4,7 +4,7 @@
             [compojure.route     :as route]
             [liberator.core      :refer [defresource]]
             [hypermq.queue       :as queue]
-            [hypermq.event       :as msg]
+            [hypermq.message     :as msg]
             [hypermq.json        :as js]))
 
 (defresource archive-messages
@@ -26,7 +26,7 @@
   :malformed? js/parse-body
   :post! (fn [context] (msg/create queue-title (context :data)))
   :post-redirect? true
-  :location (fn [context] (msg/build-url (context :hypermq.event/item)))
+  :location (fn [context] (msg/build-url (context :hypermq.message/item)))
   :handle-ok (fn [context] (queue/display (context :items))))
 
 (defresource message
@@ -34,13 +34,13 @@
   :allowed-methods [:get]
   :available-media-types ["application/json" "application/hal+json"]
   :exists? (fn [_] (msg/find-by uuid))
-  :handle-ok (fn [context] (msg/display (context :hypermq.event/item)))
+  :handle-ok (fn [context] (msg/display (context :hypermq.message/item)))
   :handle-not-found "Event not found!")
 
 (defroutes app-routes
   (GET "/" [] "Home Page")
   (ANY "/q/:queue" [queue] (recent-messages queue))
-  (ANY "/q/:queue/:archive" [queue archive] (archive-events queue archive))
+  (ANY "/q/:queue/:archive" [queue archive] (archive-messages queue archive))
   (ANY "/m/:uuid" [uuid] (message uuid))
   (route/resources "/")
   (route/not-found "Not Found"))

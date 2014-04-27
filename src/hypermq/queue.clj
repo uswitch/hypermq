@@ -1,5 +1,5 @@
 (ns hypermq.queue
-  (:require [hypermq.event :as msg]
+  (:require [hypermq.message :as msg]
             [hypermq.db :as db]))
 
 (def page-size 2)

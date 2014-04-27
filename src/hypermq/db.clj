@@ -5,34 +5,34 @@
 
 (defdb db (sqlite3 {:db "development.db"}))
 
-(declare queue event)
+(declare queue message)
 
 (defentity queue
-  (has-many event))
+  (has-many message))
 
-(defentity event
+(defentity message
   (belongs-to queue {:fk :queue-id})
   (prepare (util/mutate-row :content util/serialize))
   (transform (util/mutate-row :content util/de-serialize)))
 
-(defn get-event
+(defn get-message
   [selector]
   (first
-   (select event
+   (select message
            (where selector))))
 
-(defn event-count
+(defn message-count
   [queue-title]
-  (-> (select event
+  (-> (select message
               (aggregate (count 1) :total)
               (join :inner queue (= :queue.id :queue_id))
               (where {:queue.title queue-title}))
       first
       :total))
 
-(defn events-by-page
+(defn messages-by-page
   [queue-title page page-size]
-  (-> (select event
+  (-> (select message
               (join :inner queue (= :queue.id :queue_id))
               (where {:queue.title queue-title})
               (order :id :ASC)
@@ -59,9 +59,9 @@
       (queue :id)
       (insert-queue title))))
 
-(defn insert-event
+(defn insert-message
   [queue-id title author content]
-  (last-insert-id (insert event
+  (last-insert-id (insert message
                           (values {:uuid (util/uuid)
                                    :queue_id queue-id
                                    :title title
