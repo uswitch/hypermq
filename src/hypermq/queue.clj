@@ -20,7 +20,6 @@
 
 (defn last-modified
   [{:keys [messages]}]
-  (prn "LAST-MODIFIED" (-> messages first :created))
   (-> messages first :created))
 
 (defn find-by
