@@ -43,10 +43,12 @@ To start a web server for the application, run:
 
 Method | URI | Action
 --- | --- | ---
-GET | /q/:name | Lists the most recent events for QUEUE :name
-POST | /q/:name | Create a new message on QUEUE :name
-GET | /q/:name/:page | Lists archived events for QUEUE :name for PAGE :page
-GET | /m/:uuid | Shows details for an EVENT with :uuid
+GET | /q/myqueue | Lists the most recent events for QUEUE `myqueue`
+POST | /q/myqueue | Create a new message on QUEUE `myqueue`
+GET | /q/myqueue/1 | Lists archived events for QUEUE `myqueue` for PAGE 1
+GET | /m/ca9539ef-4763-4940-8565-e7699c1404da | Shows details for an EVENT with uuid `ca9539ef-4763-4940-8565-e7699c1404da`
+GET | /ack/myqueue/myclient | Shows the latest acknowledgement for QUEUE `myqueue` and CLIENT `myclient`
+POST | /ack/myqueue/myclient | Create a new acknowledgement on QUEUE `myqueue` for CLIENT `myclient`
 
 #### Note on queue creation
 
@@ -66,7 +68,9 @@ Each json message body looks as follows. All are optional (title, author, conten
 
 ### Example message creation
 
-`curl -v -d '{"title":"my message","author":"xian","content":{"some":"data"}}' -H "Content-Type:application/json" http://localhost:3000/q/myqueue`
+```bash
+curl -v -d '{"title":"my message","author":"xian","content":{"some":"data"}}' -H "Content-Type:application/json" http://localhost/q/myqueue
+```
 
 ## Etags
 
@@ -75,5 +79,21 @@ When you view a queue, an ETAG header will be returned indicating the state of t
 ETAGs are used by providing the value in the If-None-Match header.
 
 ```bash
-curl -i -H 'Content-Type:application/json' -H 'If-None-Match:"ca9539ef-4763-4940-8565-e7699c1404da"' http://localhost:3000/q/data
+curl -i -H 'Content-Type:application/json' -H 'If-None-Match:"ca9539ef-4763-4940-8565-e7699c1404da"' http://localhost/q/data
+```
+
+## Acknowledgements
+
+After you have consumed a message, your client can acknowledge you have processed it by POSTing the message uuid to the Acknowledgement resource.
+
+### Example Acknowledgement creation
+
+```bash
+curl -v -d '{"uuid":"ca9539ef-4763-4940-8565-e7699c1404da"}' -H "Content-Type:application/json" http://localhost/ack/myqueue/myclient
+```
+
+### Example retrieving an acknowledgement
+
+```bash
+curl -v -H "Content-Type:application/json" http://localhost/ack/myqueue/myclient
 ```
