@@ -22,7 +22,7 @@
   [{:keys [messages]}]
   (-> messages first :created))
 
-(defn find-by
+(defn messages-for
   [queue-title & [page]]
   (when-let [queue (db/find-queue queue-title)]
     (let [total (total-pages queue-title)

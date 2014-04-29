@@ -13,7 +13,7 @@
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods [:get]
   :exists? (fn [_]
-             (when-let [items (queue/find-by queue-title archive)]
+             (when-let [items (queue/messages-for queue-title archive)]
                {:items items}))
   :etag (fn [context] (queue/etag (context :items)))
   :last-modified (fn [context] (queue/last-modified (context :items)))
@@ -24,7 +24,7 @@
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods [:get :post]
   :exists? (fn [_]
-             (when-let [items (queue/find-by queue-title)]
+             (when-let [items (queue/messages-for queue-title)]
                {:items items}))
   :etag (fn [context] (queue/etag (context :items)))
   :last-modified (fn [context] (queue/last-modified (context :items)))
