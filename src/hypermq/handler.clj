@@ -43,11 +43,13 @@
   :handle-not-found "Message not found!")
 
 (defresource acknowledgement
-  [queue]
+  [queue-title]
   :allowed-methods [:post]
   :available-media-types ["application/json"]
+  :exists? (fn [_] (when-let [queue (queue/find-by queue-title)] {:queue queue}))
   :malformed? js/parse-body
-  :post! (fn [context] (ack/create queue (context :data))))
+  :can-post-to-missing? false
+  :post! (fn [context] (ack/create (context :queue) (context :data))))
 
 (defroutes app-routes
   (GET "/" [] "Home Page")
