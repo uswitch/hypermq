@@ -80,3 +80,12 @@
                    :client client
                    :uuid uuid
                    :created (util/timestamp)})))
+
+(defn select-acknowledgement
+  [queue-id client]
+  (select acknowledgement
+          (fields :uuid :created)
+          (where {:queue_id queue-id
+                  :client client})
+          (order :created :DESC)
+          (limit 1)))

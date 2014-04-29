@@ -2,5 +2,9 @@
   (:require [hypermq.db :as db]))
 
 (defn create
-  [queue {:keys [client uuid] :as ack}]
+  [queue client {:keys [uuid]}]
   (db/insert-acknowledgement (queue :id) client uuid))
+
+(defn get-latest
+  [queue client]
+  (first (db/select-acknowledgement (queue :id) client)))
