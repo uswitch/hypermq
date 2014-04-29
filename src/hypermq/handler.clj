@@ -1,11 +1,12 @@
 (ns hypermq.handler
   (:use compojure.core)
-  (:require [compojure.handler   :as handler]
-            [compojure.route     :as route]
-            [liberator.core      :refer [defresource]]
-            [hypermq.queue       :as queue]
-            [hypermq.message     :as msg]
-            [hypermq.json        :as js]))
+  (:require [compojure.handler       :as handler]
+            [compojure.route         :as route]
+            [liberator.core          :refer [defresource]]
+            [hypermq.queue           :as queue]
+            [hypermq.message         :as msg]
+            [hypermq.json            :as js]
+            [hypermq.acknowledgement :as ack]))
 
 (defresource archive-messages
   [queue-title archive]
@@ -39,13 +40,21 @@
   :available-media-types ["application/json" "application/hal+json"]
   :exists? (fn [_] (msg/find-by uuid))
   :handle-ok (fn [context] (msg/display (context :hypermq.message/item)))
-  :handle-not-found "Event not found!")
+  :handle-not-found "Message not found!")
+
+(defresource acknowledgement
+  [queue]
+  :allowed-methods [:post]
+  :available-media-types ["application/json"]
+  :malformed? js/parse-body
+  :post! (fn [context] (ack/create queue (context :data))))
 
 (defroutes app-routes
   (GET "/" [] "Home Page")
   (ANY "/q/:queue" [queue] (recent-messages queue))
   (ANY "/q/:queue/:archive" [queue archive] (archive-messages queue archive))
   (ANY "/m/:uuid" [uuid] (message uuid))
+  (ANY "/ack/:queue" [queue] (acknowledgement queue))
   (route/resources "/")
   (route/not-found "Not Found"))
 

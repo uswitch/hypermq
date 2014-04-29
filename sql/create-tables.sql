@@ -13,3 +13,11 @@ CREATE TABLE IF NOT EXISTS message (
   content BLOB,
   created BIGINT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS acknowledgement (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  queue_id INT NOT NULL,
+  client VARCHAR(255) NOT NULL,
+  uuid VARCHAR(36) NOT NULL,
+  created BIGINT NOT NULL
+);

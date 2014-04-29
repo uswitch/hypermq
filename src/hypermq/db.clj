@@ -5,15 +5,18 @@
 
 (defdb db (sqlite3 {:db "development.db"}))
 
-(declare queue message)
+(declare queue message acknowledgement)
 
 (defentity queue
   (has-many message))
 
 (defentity message
-  (belongs-to queue {:fk :queue-id})
+  (belongs-to queue {:fk :queue_id})
   (prepare (util/mutate-row :content util/serialize))
   (transform (util/mutate-row :content util/de-serialize)))
+
+(defentity acknowledgement
+  (belongs-to queue {:fk :queue_id}))
 
 (defn get-message
   [selector]
@@ -69,3 +72,11 @@
                                    :author author
                                    :content content
                                    :created (util/timestamp)}))))
+
+(defn insert-acknowledgement
+  [queue-id client uuid]
+  (insert acknowledgement
+          (values {:queue_id queue-id
+                   :client client
+                   :uuid uuid
+                   :created (util/timestamp)})))
