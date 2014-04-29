@@ -3,6 +3,10 @@
             [clj-time.coerce :as c]
             [clojure.tools.reader :as edn]))
 
+(defn timestamp->str
+  [timestamp]
+  (c/from-long timestamp))
+
 (defn timestamp [] (c/to-long (t/now)))
 
 (defn uuid [] (str (java.util.UUID/randomUUID)))

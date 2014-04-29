@@ -6,7 +6,8 @@
             [hypermq.queue           :as queue]
             [hypermq.message         :as msg]
             [hypermq.json            :as js]
-            [hypermq.acknowledgement :as ack]))
+            [hypermq.acknowledgement :as ack]
+            [hypermq.views           :as view]))
 
 (defresource archive-messages
   [queue-title archive]
@@ -54,6 +55,7 @@
 
 (defroutes app-routes
   (GET "/" [] "Home Page")
+  (GET "/monitoring" [] (view/monitoring))
   (ANY "/q/:queue" [queue] (recent-messages queue))
   (ANY "/q/:queue/:archive" [queue archive] (archive-messages queue archive))
   (ANY "/m/:uuid" [uuid] (message uuid))

@@ -89,3 +89,19 @@
                   :client client})
           (order :created :DESC)
           (limit 1)))
+
+(defn queue-latest
+  []
+  (select message
+          (fields :queue_id, :uuid)
+          (aggregate (max :created) :last-modified)
+          (with queue
+                (fields :title))
+          (group :queue_id)))
+
+(defn latest-acknowledgements
+  [queue-id]
+  (select acknowledgement
+          (fields :client, :uuid)
+          (aggregate (max :created) :last-modified)
+          (group :client)))
