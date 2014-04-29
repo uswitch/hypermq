@@ -12,7 +12,7 @@
     {::item (db/get-message {:id event-id})}))
 
 (defn build-url [message]
-  (format "http://localhost:3000/m/%s" (message :uuid)))
+  (format "http://localhost/m/%s" (message :uuid)))
 
 (defn display
   [message]
@@ -24,4 +24,4 @@
 
 (defn get-page
   [queue page page-size]
-  (db/messages-by-page queue page page-size))
+  (sort-by :created > (db/messages-by-page queue page page-size)))

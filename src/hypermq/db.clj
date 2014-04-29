@@ -33,6 +33,7 @@
 (defn messages-by-page
   [queue-title page page-size]
   (-> (select message
+              (fields :uuid :title :author :content :created)
               (join :inner queue (= :queue.id :queue_id))
               (where {:queue.title queue-title})
               (order :id :ASC)

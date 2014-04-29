@@ -34,7 +34,7 @@
 
 (defn build-url
   [queue page]
-  (format "http://localhost:3000/q/%s/%s" queue page))
+  (format "http://localhost/q/%s/%s" queue page))
 
 (defn build-links
   [queue current-page total-pages]
