@@ -12,7 +12,7 @@
   :exists? (fn [_] (when-let [items (queue/messages-for queue-title uuid)] {:items items}))
   :etag (fn [context] (queue/etag (context :items)))
   :last-modified (fn [context] (queue/last-modified (context :items)))
-  :handle-ok (fn [context] (queue/display context)))
+  :handle-ok (fn [context] (queue/display (context :items))))
 
 (defresource list-message-head
   [queue-title]
@@ -23,7 +23,7 @@
   :last-modified (fn [context] (queue/last-modified (context :items)))
   :malformed? js/parse-body
   :post! (fn [context] (msg/create queue-title (context :data)))
-  :handle-ok (fn [context] (queue/display context)))
+  :handle-ok (fn [context] (queue/display (context :items))))
 
 (defresource message
   [uuid]

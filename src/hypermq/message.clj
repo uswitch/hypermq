@@ -12,7 +12,7 @@
     {::item (db/get-message {:id event-id})}))
 
 (defn build-url [message]
-  (format "http://localhost/m/%s" (message :uuid)))
+  (format "/m/%s" (message :uuid)))
 
 (defn display
   [message]

@@ -37,24 +37,24 @@
                     :prev-page (prev-page-uuid prev-page-messages)}))))
 
 (defn build-url
-  [{:keys [scheme server-name server-port]} queue uuid]
+  [queue uuid]
   (if uuid
-    (format "%s://%s:%s/q/%s/%s" scheme server-name server-port queue uuid)
-    (format "%s://%s:%s/q/%s" scheme server-name server-port queue)))
+    (format "/q/%s/%s" queue uuid)
+    (format "/q/%s" queue)))
 
 (defn build-links
-  [request {:keys [title current-page next-page prev-page]}]
-  (cond-> {:self {:href (build-url request title current-page)}}
+  [{:keys [title current-page next-page prev-page]}]
+  (cond-> {:self {:href (build-url title current-page)}}
 
           next-page
-          (merge {:next {:href (build-url request title next-page)}})
+          (merge {:next {:href (build-url title next-page)}})
 
           (or current-page prev-page)
-          (merge {:prev {:href (build-url request title prev-page)}})))
+          (merge {:prev {:href (build-url title prev-page)}})))
 
 (defn display
-  [{:keys [items request] :as context}]
-  {:queue (items :title)
-   :uuid (items :uuid)
-   :_links (build-links request items)
-   :_embedded {:message (map msg/display (items :messages))}})
+  [{:keys [title uuid messages] :as queue}]
+  {:queue title
+   :uuid uuid
+   :_links (build-links queue)
+   :_embedded {:message (map msg/display messages)}})
