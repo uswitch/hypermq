@@ -3,11 +3,11 @@
   (:require [hypermq.db   :as db]
             [hypermq.util :as util]))
 
-(defn monitoring
-  []
+(defn- layout
+   [{:keys [body]}]
   (html5
    [:head
-    [:title "Hello World"]
+    [:title "Hypermq - Hypermedia message queue server"]
     [:link {:rel "stylesheet" :href "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css"}]
     [:link {:rel "stylesheet" :href "//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css"}]]
    [:body
@@ -27,12 +27,32 @@
         [:li [:a {:href "/monitoring"} "Monitoring"]]]]]]
 
     [:div.container
+     body
+     [:script {:src "//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"}]]]))
+
+(defn- acknowledgement
+  [queue-uuid {:keys [client uuid]}]
+  (let [up-to-date (= uuid queue-uuid)]
+    [:li [:button {:type "button" :class (str  "btn btn-xs " (if up-to-date "btn-success" "btn-danger"))} client]]))
+
+(defn- queue-status
+  [{:keys [title uuid queue_id]}]
+  [:li.col-md-3
+   [:h4 title]
+   [:p.text-muted [:small uuid]]
+   [:ul.list-inline
+    (map (partial acknowledgement uuid) (db/latest-acknowledgements queue_id))]])
+
+(defn monitoring
+  []
+  (layout {:body
+    [:div
      [:h1 "Hypermq Monitoring Dashboard"]
-     (for [q (db/queue-latest)]
-       [:div.col-md-4
-        [:dl
-         [:dt (q :title) " " [:span.text-info (util/timestamp->str (q :last-modified))]]
-         [:dd.text-info (q :uuid)]
-         (for [ack (db/latest-acknowledgements (q :queue_id))]
-           [:dd.text-muted [:strong (ack :client)] " : " (ack :uuid) " " (util/timestamp->str (ack :last-modified))]
-           )]])]]))
+     [:h2 "Queue / Client status"]
+     [:ul.list-inline
+      (map queue-status (db/queue-latest))]]}))
+
+(defn index
+  []
+  (layout {:body
+           [:div [:h1 "Hypermq Server Home"]]}))

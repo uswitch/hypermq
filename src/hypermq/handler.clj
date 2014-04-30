@@ -54,7 +54,7 @@
   :handle-ok (fn [context] (ack/get-latest (context :queue) client)))
 
 (defroutes app-routes
-  (GET "/" [] "Home Page")
+  (GET "/" [] (view/index))
   (GET "/monitoring" [] (view/monitoring))
   (ANY "/q/:queue" [queue] (recent-messages queue))
   (ANY "/q/:queue/:archive" [queue archive] (archive-messages queue archive))
