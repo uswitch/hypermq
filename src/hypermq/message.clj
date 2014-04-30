@@ -22,6 +22,11 @@
   [queue]
   (db/message-count queue))
 
-(defn get-page
-  [queue page page-size]
-  (sort-by :created > (db/messages-by-page queue page page-size)))
+(defn next-page
+  [queue uuid page-size]
+  (db/next-messages queue uuid page-size))
+
+(defn prev-page
+  [queue uuid page-size]
+  (when uuid
+    (reverse (db/prev-messages queue uuid page-size))))

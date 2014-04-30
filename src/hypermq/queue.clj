@@ -4,55 +4,57 @@
 
 (def page-size 2)
 
-(defn total-pages
-  [queue]
-  (quot (- (msg/total queue) 1) page-size))
-
-(defn current-page
-  [page total-pages]
-  (if (nil? page)
-    total-pages
-    (Integer/parseInt page)))
-
 (defn etag
   [{:keys [messages]}]
-  (-> messages first :uuid))
+  (-> messages last :uuid))
 
 (defn last-modified
   [{:keys [messages]}]
-  (-> messages first :created))
+  (-> messages last :created))
 
 (defn find-by
   [queue-title]
   (db/find-queue queue-title))
 
+(defn next-page-uuid
+  [messages]
+  (when (= (count messages) page-size)
+    (:uuid (last messages))))
+
+(defn prev-page-uuid
+  [messages]
+  (when (= (count messages) page-size)
+    (:uuid (first messages))))
+
 (defn messages-for
-  [queue-title & [page]]
+  [queue-title & [uuid]]
   (when-let [queue (find-by queue-title)]
-    (let [total (total-pages queue-title)
-          current (current-page page total)
-          messages (msg/get-page queue-title current page-size)]
+    (let [messages (msg/next-page queue uuid page-size)
+          prev-page-messages (msg/prev-page queue uuid page-size)]
       (merge queue {:messages messages
-                    :current-page current
-                    :total-pages total}))))
+                    :current-page uuid
+                    :next-page (next-page-uuid messages)
+                    :prev-page (prev-page-uuid prev-page-messages)}))))
 
 (defn build-url
-  [queue page]
-  (format "http://localhost/q/%s/%s" queue page))
+  [{:keys [scheme server-name server-port]} queue uuid]
+  (if uuid
+    (format "%s://%s:%s/q/%s/%s" scheme server-name server-port queue uuid)
+    (format "%s://%s:%s/q/%s" scheme server-name server-port queue)))
 
 (defn build-links
-  [queue current-page total-pages]
-  (cond-> {:self {:href (build-url queue current-page)}}
+  [request {:keys [title current-page next-page prev-page]}]
+  (cond-> {:self {:href (build-url request title current-page)}}
 
-          (< current-page total-pages)
-          (merge {:next {:href (build-url queue (inc current-page))}})
+          next-page
+          (merge {:next {:href (build-url request title next-page)}})
 
-          (< 0 current-page)
-          (merge {:prev {:href (build-url queue (dec current-page))}})))
+          (or current-page prev-page)
+          (merge {:prev {:href (build-url request title prev-page)}})))
 
 (defn display
-  [{:keys [title uuid messages current-page total-pages]}]
-  {:queue title
-   :uuid uuid
-   :_links (build-links title current-page total-pages)
-   :_embedded {:message (map msg/display messages)}})
+  [{:keys [items request] :as context}]
+  {:queue (items :title)
+   :uuid (items :uuid)
+   :_links (build-links request items)
+   :_embedded {:message (map msg/display (items :messages))}})

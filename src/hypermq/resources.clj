@@ -5,16 +5,16 @@
             [hypermq.json            :as js]
             [hypermq.acknowledgement :as ack]))
 
-(defresource archive-messages
-  [queue-title archive]
+(defresource list-message-tail
+  [queue-title uuid]
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods [:get]
-  :exists? (fn [_] (when-let [items (queue/messages-for queue-title archive)] {:items items}))
+  :exists? (fn [_] (when-let [items (queue/messages-for queue-title uuid)] {:items items}))
   :etag (fn [context] (queue/etag (context :items)))
   :last-modified (fn [context] (queue/last-modified (context :items)))
-  :handle-ok (fn [context] (queue/display (context :items))))
+  :handle-ok (fn [context] (queue/display context)))
 
-(defresource recent-messages
+(defresource list-message-head
   [queue-title]
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods [:get :post]
@@ -23,9 +23,7 @@
   :last-modified (fn [context] (queue/last-modified (context :items)))
   :malformed? js/parse-body
   :post! (fn [context] (msg/create queue-title (context :data)))
-  :post-redirect? true
-  :location (fn [context] (msg/build-url (context :hypermq.message/item)))
-  :handle-ok (fn [context] (queue/display (context :items))))
+  :handle-ok (fn [context] (queue/display context)))
 
 (defresource message
   [uuid]

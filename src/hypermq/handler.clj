@@ -8,8 +8,8 @@
 (defroutes app-routes
   (GET "/" [] (view/home))
   (GET "/monitoring" [] (view/monitoring))
-  (ANY "/q/:queue" [queue] (resource/recent-messages queue))
-  (ANY "/q/:queue/:archive" [queue archive] (resource/archive-messages queue archive))
+  (ANY "/q/:queue" [queue] (resource/list-message-head queue))
+  (ANY "/q/:queue/:uuid" [queue uuid] (resource/list-message-tail queue uuid))
   (ANY "/m/:uuid" [uuid] (resource/message uuid))
   (ANY "/ack/:queue/:client" [queue client] (resource/acknowledgement queue client))
   (route/resources "/")
