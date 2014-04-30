@@ -3,8 +3,12 @@
   (:require [hypermq.db   :as db]
             [hypermq.util :as util]))
 
+(defn tab-active?
+  [tab expected]
+  (when (= tab expected) {:class "active"}))
+
 (defn- layout
-   [{:keys [body]}]
+   [{:keys [tab body]}]
   (html5
    [:head
     [:title "Hypermq - Hypermedia message queue server"]
@@ -21,13 +25,15 @@
         [:span.icon-bar]
         [:span.icon-bar]]
        [:a.navbar-brand {:href ""} "Hypermq Dashboard"]]
+
       [:div.collapse.navbar-collapse
        [:ul.nav.navbar-nav
-        [:li.active [:a {:href "/"} "Home"]]
-        [:li [:a {:href "/monitoring"} "Monitoring"]]]]]]
+        [:li (tab-active? tab :home) [:a {:href "/"} "Home"]]
+        [:li (tab-active? tab :monitoring) [:a {:href "/monitoring"} "Monitoring"]]]]]]
 
     [:div.container
      body
+     [:script {:src "//code.jquery.com/jquery-1.11.0.min.js"}]
      [:script {:src "//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"}]]]))
 
 (defn- acknowledgement
@@ -45,14 +51,20 @@
 
 (defn monitoring
   []
-  (layout {:body
-    [:div
-     [:h1 "Hypermq Monitoring Dashboard"]
-     [:h2 "Queue / Client status"]
-     [:ul.list-inline
-      (map queue-status (db/queue-latest))]]}))
+  (layout {:tab :monitoring
+           :body [:div
+                  [:h1 "Hypermq Monitoring Dashboard"]
+                  [:h2 "Queue / Client status"]
+                  [:ul.list-inline
+                   (map queue-status (db/queue-latest))]]}))
 
-(defn index
+(defn home
   []
-  (layout {:body
-           [:div [:h1 "Hypermq Server Home"]]}))
+  (layout {:tab :home
+           :body
+           [:div
+            [:h1 "Hypermq Server Home"]
+            [:h2 "Active Queues"]
+            [:ul.list-inline
+             (for [{:keys [title]} (db/queue-latest)]
+               [:li {:style "margin-bottom:10px;"} [:a.btn.btn-info.btn-lg {:role "button" :href (str "/q/" title)} title]])]]}))

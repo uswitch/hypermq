@@ -104,4 +104,5 @@
   (select acknowledgement
           (fields :client, :uuid)
           (aggregate (max :created) :last-modified)
+          (where {:queue_id queue-id})
           (group :client)))
