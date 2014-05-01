@@ -33,15 +33,32 @@
       first
       :total))
 
-(defn messages-by-page
-  [queue-title page page-size]
-  (-> (select message
-              (fields :uuid :title :author :content :created)
-              (join :inner queue (= :queue.id :queue_id))
-              (where {:queue.title queue-title})
-              (order :id :ASC)
-              (offset (* page page-size))
-              (limit page-size))))
+(defn prev-messages
+  [{:keys [id]} uuid page-size]
+  (select message
+          (fields :uuid)
+          (where {:queue_id id
+                  :id [< (subselect message (fields :id) (where {:uuid uuid}))]})
+          (order :id :DESC)
+          (limit page-size)))
+
+(defn base-messages
+  [queue-id page-size]
+  (-> (select* message)
+      (fields :uuid :title :author :content :created)
+      (where {:queue_id queue-id})
+      (order :id :ASC)
+      (limit page-size)))
+
+(defn next-messages
+  [{:keys [id]} uuid page-size]
+  (let [base (base-messages id page-size)]
+    (if uuid
+      (-> base
+          (where {:id [> (subselect message (fields :id) (where {:uuid uuid}))]})
+          (select))
+
+      (-> base (select)))))
 
 (defn find-queue
   [title]
