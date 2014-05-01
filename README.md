@@ -43,9 +43,9 @@ To start a web server for the application, run:
 
 Method | URI | Action
 --- | --- | ---
-GET | /q/myqueue | Lists the most recent events for QUEUE `myqueue`
+GET | /q/myqueue | Lists page of events for QUEUE `myqueue` from beginning
 POST | /q/myqueue | Create a new message on QUEUE `myqueue`
-GET | /q/myqueue/1 | Lists archived events for QUEUE `myqueue` for PAGE 1
+GET | /q/myqueue/ca9539ef-4763-4940-8565-e7699c1404da | List page of events for QUEUE `myqueue` from message `ca9539ef-4763-4940-8565-e7699c1404da`
 GET | /m/ca9539ef-4763-4940-8565-e7699c1404da | Shows details for an EVENT with uuid `ca9539ef-4763-4940-8565-e7699c1404da`
 GET | /ack/myqueue/myclient | Shows the latest acknowledgement for QUEUE `myqueue` and CLIENT `myclient`
 POST | /ack/myqueue/myclient | Create a new acknowledgement on QUEUE `myqueue` for CLIENT `myclient`
@@ -60,16 +60,15 @@ Each json message body looks as follows. All are optional (title, author, conten
 
 ```json
 {
-  "title" : "the title of the event",
-  "author" : "the message creator",
-  "content" : { "some":"custom data", "can":"contain any json" }
+  "producer" : "name/id of the message creator",
+  "body" : { "some" : "custom data", "can" : "contain any json" }
 }
 ```
 
 ### Example message creation
 
 ```bash
-curl -v -d '{"title":"my message","author":"xian","content":{"some":"data"}}' -H "Content-Type:application/json" http://localhost/q/myqueue
+curl -v -d '{"producer":"myproducer","bosy":{"some":"data"}}' -H "Content-Type:application/json" http://localhost/q/myqueue
 ```
 
 ## Etags
@@ -89,7 +88,7 @@ After you have consumed a message, your client can acknowledge you have processe
 ### Example Acknowledgement creation
 
 ```bash
-curl -v -d '{"uuid":"ca9539ef-4763-4940-8565-e7699c1404da"}' -H "Content-Type:application/json" http://localhost/ack/myqueue/myclient
+curl -v -d '{"id":"ca9539ef-4763-4940-8565-e7699c1404da"}' -H "Content-Type:application/json" http://localhost/ack/myqueue/myclient
 ```
 
 ### Example retrieving an acknowledgement

@@ -1,23 +1,16 @@
-CREATE TABLE IF NOT EXISTS queue (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  title VARCHAR(255) NOT NULL,
-  uuid VARCHAR(36) NOT NULL
-);
-
 CREATE TABLE IF NOT EXISTS message (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  uuid VARCHAR(36) NOT NULL,
-  queue_id INT NOT NULL,
-  title VARCHAR(255),
-  author VARCHAR(255),
-  content BLOB,
+  id varchar(36) PRIMARY KEY,
+  queue VARCHAR(255) NOT NULL,
+  producer VARCHAR(255),
+  body BLOB,
   created BIGINT NOT NULL
 );
+CREATE INDEX queue_idx ON message (queue);
 
 CREATE TABLE IF NOT EXISTS acknowledgement (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  queue_id INT NOT NULL,
+  queue varchar(255) NOT NULL,
   client VARCHAR(255) NOT NULL,
-  uuid VARCHAR(36) NOT NULL,
-  created BIGINT NOT NULL
+  message VARCHAR(36) NOT NULL,
+  created BIGINT NOT NULL,
+  PRIMARY KEY (queue, client, message)
 );

@@ -9,8 +9,6 @@
 
 (defn timestamp [] (c/to-long (t/now)))
 
-(defn uuid [] (str (java.util.UUID/randomUUID)))
-
 (defn serialize [x]
   (pr-str x))
 
