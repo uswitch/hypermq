@@ -1,7 +1,9 @@
 (ns hypermq.views
   (:use [hiccup core page])
-  (:require [hypermq.db   :as db]
-            [hypermq.util :as util]))
+  (:require [hypermq.db    :as db]
+            [hypermq.ack   :as ack]
+            [hypermq.queue :as queue]
+            [hypermq.util  :as util]))
 
 (defn tab-active?
   [tab expected]
@@ -37,17 +39,17 @@
      [:script {:src "//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"}]]]))
 
 (defn- acknowledgement
-  [queue-uuid {:keys [client uuid]}]
-  (let [up-to-date (= uuid queue-uuid)]
+  [queue-latest {:keys [client message]}]
+  (let [up-to-date (= message queue-latest)]
     [:li [:button {:type "button" :class (str  "btn btn-xs " (if up-to-date "btn-success" "btn-danger"))} client]]))
 
 (defn- queue-status
-  [{:keys [title uuid queue_id]}]
+  [{:keys [queue id last-modified]}]
   [:li.col-md-3
-   [:h4 title]
-   [:p.text-muted [:small uuid]]
+   [:h4 queue]
+   [:p.text-muted [:small id]]
    [:ul.list-inline
-    (map (partial acknowledgement uuid) (db/latest-acknowledgements queue_id))]])
+    (map (partial acknowledgement id) (ack/latest queue))]])
 
 (defn monitoring
   []
@@ -56,7 +58,7 @@
                   [:h1 "Hypermq Monitoring Dashboard"]
                   [:h2 "Queue / Client status"]
                   [:ul.list-inline
-                   (map queue-status (db/queue-latest))]]}))
+                   (map queue-status (queue/latest))]]}))
 
 (defn home
   []
@@ -66,5 +68,5 @@
             [:h1 "Hypermq Server Home"]
             [:h2 "Active Queues"]
             [:ul.list-inline
-             (for [{:keys [title]} (db/queue-latest)]
-               [:li {:style "margin-bottom:10px;"} [:a.btn.btn-info.btn-lg {:role "button" :href (str "/q/" title)} title]])]]}))
+             (for [{:keys [queue]} (queue/latest)]
+               [:li {:style "margin-bottom:10px;"} [:a.btn.btn-info.btn-lg {:role "button" :href (str "/q/" queue)} queue]])]]}))

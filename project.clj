@@ -1,7 +1,10 @@
 (defproject hypermq "0.1.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
+  :repositories [["eaio.com" {:url "http://eaio.com/maven2/"
+                              :checksum :ignore}]]
   :dependencies [[org.clojure/clojure "1.5.1"]
+                 [com.eaio.uuid/uuid "3.4"]
                  [compojure "1.1.6"]
                  [liberator "0.11.0"]
                  [korma "0.3.0-RC5"]

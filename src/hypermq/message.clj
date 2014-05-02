@@ -1,32 +1,23 @@
 (ns hypermq.message
-  (:require [hypermq.db :as db]))
+  (:require [korma.core   :refer :all]
+            [hypermq.db   :refer :all]
+            [hypermq.page :as page]
+            [hypermq.uuid :as uuid]
+            [hypermq.util :as util]))
 
-(defn find-by
-  [uuid]
-  {::item (db/get-message {:uuid uuid})})
+(defn fetch
+  [queue last-seen]
+  (let [msg-id (or last-seen "")]
+    (select message
+            (where {:queue queue :id [> msg-id]})
+            (limit page/page-size)
+            (order :id :ASC))))
 
 (defn create
-  [queue {:keys [title author content] :as ev}]
-  (let [queue-id (db/find-or-create-queue queue)
-        event-id (db/insert-message queue-id title author content)]
-    {::item (db/get-message {:id event-id})}))
-
-(defn build-url [message]
-  (format "/m/%s" (message :uuid)))
-
-(defn display
-  [message]
-  (assoc message :_links {:self {:href (build-url message)}}))
-
-(defn total
-  [queue]
-  (db/message-count queue))
-
-(defn next-page
-  [queue uuid page-size]
-  (db/next-messages queue uuid page-size))
-
-(defn prev-page
-  [queue uuid page-size]
-  (when uuid
-    (reverse (db/prev-messages queue uuid page-size))))
+  [queue {:keys [producer body]}]
+  (insert message
+          (values {:id (uuid/generate)
+                   :queue queue
+                   :producer producer
+                   :body body
+                   :created (util/timestamp)})))
