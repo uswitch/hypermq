@@ -9,7 +9,9 @@
   (GET  "/"                   []             (view/home))
   (GET  "/monitoring"         []             (view/monitoring))
 
-  (POST "/q/:queue"           [queue]        (resource/message queue))
+  (GET  "/m/:msg-id"          {params :params} (resource/message params))
+  (POST "/q/:queue"           {params :params} (resource/message params))
+
   (GET  "/q/:queue"           [queue]        (resource/queue queue))
   (GET  "/q/:queue/:msg-id"   [queue msg-id] (resource/queue queue msg-id))
 

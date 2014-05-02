@@ -6,15 +6,17 @@
             [hypermq.json    :as js]
             [hypermq.ack     :as ack]))
 
-(declare media-types etag last-modified display-messages
+(declare media-types etag last-modified display-messages find-message?
          create-message unread-messages? ack-message display-ack)
 
 (defresource message
-  [queue]
+  [{:keys [msg-id queue]}]
   :available-media-types ["application/json" "application/hal+json"]
-  :allowed-methods       [:post]
+  :allowed-methods       [:get :post]
+  :exists?               (find-message? msg-id)
   :malformed?            js/parse-body
-  :post!                 (create-message queue))
+  :post!                 (create-message queue)
+  :handle-ok             :message)
 
 (defresource queue
   [queue & [msg-id]]
@@ -49,6 +51,10 @@
 (defn- create-message
   [queue]
   (fn [context] (msg/create queue (context :data))))
+
+(defn- find-message?
+  [msg-id]
+  (fn [context] (when-let [msg (msg/get msg-id)] {:message msg})))
 
 (defn- unread-messages?
   [queue msg-id]

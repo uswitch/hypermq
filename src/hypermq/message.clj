@@ -5,6 +5,11 @@
             [hypermq.uuid :as uuid]
             [hypermq.util :as util]))
 
+(defn get
+  [msg-id]
+  (first  (select message
+                  (where {:id msg-id}))))
+
 (defn fetch
   [queue last-seen]
   (let [msg-id (or last-seen "")]
