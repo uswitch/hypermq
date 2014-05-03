@@ -17,5 +17,4 @@
           [false {:data data}])
         {:message "No body"})
       (catch Exception e
-        (.printStackTrace e)
         {:message (format "IOException: " (.getMessage e))}))))
