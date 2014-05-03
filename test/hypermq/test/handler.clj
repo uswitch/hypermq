@@ -2,7 +2,8 @@
   (:require [ring.mock.request :refer :all]
             [midje.sweet       :refer :all]
             [hypermq.handler   :refer :all]
-            [hypermq.message   :as msg]))
+            [hypermq.message   :as msg]
+            [hypermq.ack       :as ack]))
 
 (defn- json-request
   [method uri & {:keys [content etag]}]
@@ -44,3 +45,13 @@
       (app (json-request :get "/q/fooqueue/uuid1" :etag "uuid2")) => (contains {:status 304})
       (provided
        (msg/fetch "fooqueue" "uuid1") => [{:id "uuid2"}]))
+
+(fact "Should create acknowledgement for a client"
+      (app (json-request :post "/ack/fooqueue/client1" :content "{\"id\":\"uuid2\"}")) => (contains {:status 201})
+      (provided
+       (ack/create "fooqueue" "client1" "uuid2") => anything))
+
+(fact "Should retrieve last seen message-id for a queue & client"
+      (app (json-request :get "/ack/fooqueue/client1")) => (contains {:body (contains "uuid2")})
+      (provided
+       (ack/latest "fooqueue" "client1") => {:message "uuid2"}))
