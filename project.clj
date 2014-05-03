@@ -16,4 +16,5 @@
   :profiles
   {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
                         [ring-mock "0.1.5"]
-                        [org.xerial/sqlite-jdbc "3.7.2"]]}})
+                        [org.xerial/sqlite-jdbc "3.7.2"]
+                        [midje "1.5.1"]]}})

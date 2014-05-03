@@ -6,6 +6,7 @@
   (if-let [body (get-in ctx [:request :body])]
     (condp instance? body
       java.lang.String body
+      java.io.ByteArrayInputStream (slurp body)
       (slurp (io/reader body)))))
 
 (defn parse-body [context]
