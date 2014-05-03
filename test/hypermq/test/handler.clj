@@ -5,17 +5,18 @@
             [hypermq.message   :as msg]))
 
 (defn- json-request
-  [method uri & [content]]
-  (let [base-request (content-type (request method uri) "application/json")]
+  [method uri & {:keys [content etag]}]
+  (let [base-request (-> (request method uri)
+                         (content-type "application/json"))]
     (case method
-      :get base-request
+      :get  (header base-request "If-None-Match" (format "\"%s\"" etag))
       :post (body base-request content))))
 
 (fact "create message should fail if body is not valid json"
-      (app (json-request :post "/q/myqueue" "}\"invalid-json{")) => (contains {:status 400}))
+      (app (json-request :post "/q/myqueue" :content "}\"invalid-json{")) => (contains {:status 400}))
 
 (fact "Should parse json body to create message on queue"
-      (app (json-request :post "/q/myqueue" "{\"producer\":\"myproducer\",\"body\":{\"msg\":1}}")) => (contains {:status 201})
+      (app (json-request :post "/q/myqueue" :content "{\"producer\":\"myproducer\",\"body\":{\"msg\":1}}")) => (contains {:status 201})
       (provided
        (msg/create "myqueue" {:producer "myproducer" :body {:msg 1}}) => anything))
 
@@ -38,3 +39,8 @@
       (app (json-request :get "/q/fooqueue/uuid1")) => (contains {:headers (contains {"Last-Modified" "Sat, 03 May 2014 10:25:41 GMT"})})
       (provided
        (msg/fetch "fooqueue" "uuid1") => [{:id "uuid2" :created 1000} {:id "uuid3" :created 1399112741000}]))
+
+(fact "Should return 304 when requested etag matches page"
+      (app (json-request :get "/q/fooqueue/uuid1" :etag "uuid2")) => (contains {:status 304})
+      (provided
+       (msg/fetch "fooqueue" "uuid1") => [{:id "uuid2"}]))
