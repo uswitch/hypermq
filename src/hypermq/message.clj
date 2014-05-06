@@ -1,4 +1,5 @@
 (ns hypermq.message
+  (:refer-clojure :exclude [get])
   (:require [korma.core   :refer :all]
             [hypermq.db   :refer :all]
             [hypermq.page :as page]
