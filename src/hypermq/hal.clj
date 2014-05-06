@@ -1,14 +1,13 @@
 (ns hypermq.hal
   (:require [clojure.string :as s]
+            [hypermq.config :as config]
             [hypermq.page   :as page]))
-
-(def host "localhost:3000")
 
 (defn- url
   [queue msg-id]
   (if msg-id
-    (format "http://%s/q/%s/%s" host queue msg-id)
-    (format "http://%s/q/%s" host queue)))
+    (format "http://%s/q/%s/%s" config/hostname queue msg-id)
+    (format "http://%s/q/%s" config/hostname queue)))
 
 (defn- links
   [queue msg-id messages]
