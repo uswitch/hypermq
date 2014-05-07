@@ -14,6 +14,7 @@
   :available-media-types ["application/json" "application/hal+json"]
   :allowed-methods       [:get :post]
   :exists?               (find-message? msg-id)
+  :can-post-to-missing?  true
   :malformed?            js/parse-body
   :post!                 (create-message queue)
   :handle-ok             :message)
