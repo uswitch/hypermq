@@ -2,7 +2,7 @@
   (:require [korma.core   :refer :all]
             [hypermq.db   :refer :all]))
 
-(def page-size 2)
+(def page-size 100)
 
 (defn previous-page
   [queue msg-id]
