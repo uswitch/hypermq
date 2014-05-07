@@ -47,6 +47,7 @@
   [{:keys [queue id last-modified]}]
   [:li.col-md-3
    [:h4 queue]
+   [:p (util/timestamp->str last-modified)]
    [:p.text-muted [:small id]]
    [:ul.list-inline
     (map (partial acknowledgement id) (ack/latest queue))]])

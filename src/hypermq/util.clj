@@ -1,11 +1,12 @@
 (ns hypermq.util
-  (:require [clj-time.core :as t]
-            [clj-time.coerce :as c]
+  (:require [clj-time.core        :as t]
+            [clj-time.coerce      :as c]
+            [clj-time.format      :as f]
             [clojure.tools.reader :as edn]))
 
 (defn timestamp->str
   [timestamp]
-  (c/from-long timestamp))
+  (f/unparse (f/formatters :mysql) (c/from-long timestamp)))
 
 (defn timestamp [] (c/to-long (t/now)))
 
