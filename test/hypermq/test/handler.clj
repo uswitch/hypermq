@@ -17,9 +17,7 @@
       (app (json-request :post "/q/myqueue" :content "}\"invalid-json{")) => (contains {:status 400}))
 
 (fact "Should parse json body to create message on queue"
-      (app (json-request :post "/q/myqueue" :content "{\"producer\":\"myproducer\",\"body\":{\"msg\":1}}")) => (contains {:status 201})
-      (provided
-       (msg/create "myqueue" {:producer "myproducer" :body {:msg 1}}) => anything))
+      (app (json-request :post "/q/myqueue" :content "{\"producer\":\"myproducer\",\"body\":{\"msg\":1}}")) => (contains {:status 201}))
 
 (fact "Should list messages on a queue from the beginning"
       (app (json-request :get "/q/myqueue")) => (contains {:status 200 :body (contains "uuid1")})
@@ -50,6 +48,11 @@
       (app (json-request :post "/ack/fooqueue/client1" :content "{\"id\":\"uuid2\"}")) => (contains {:status 201})
       (provided
        (ack/create "fooqueue" "client1" "uuid2") => anything))
+
+(fact "Should not fail on duplicate acknowledgements"
+      (app (json-request :post "/ack/fooqueue/client1" :content "{\"id\":\"uuid2\"}")) => (contains {:status 201})
+      (provided
+       (ack/acknowledged? "fooqueue" "client1" "uuid2") => anything))
 
 (fact "Should retrieve last seen message-id for a queue & client"
       (app (json-request :get "/ack/fooqueue/client1")) => (contains {:body (contains "uuid2")})
