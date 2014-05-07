@@ -5,17 +5,20 @@
 
 (defn acknowledged?
   [queue client msg-id]
-  (first (select acknowledgement
-                 (where {:queue queue :client client :message msg-id}))))
+  (:message
+    (first (select acknowledgement
+                   (fields :message)
+                   (where {:queue queue :client client :message msg-id})))))
 
 (defn create
   [queue client msg-id]
-  (or (acknowledged? queue client msg-id)
-      (insert acknowledgement
-              (values {:queue queue
-                       :client client
-                       :message msg-id
-                       :created (util/timestamp)}))))
+  {:message
+   (or (acknowledged? queue client msg-id)
+       (insert acknowledgement
+               (values {:queue queue
+                        :client client
+                        :message msg-id
+                        :created (util/timestamp)})))})
 
 (defn latest
   ([queue]
