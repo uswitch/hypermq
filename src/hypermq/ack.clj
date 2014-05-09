@@ -28,7 +28,6 @@
 
   ([queue client]
    (first (select acknowledgement
-                  (fields :message)
                   (where {:queue queue :client client})
                   (order :created :DESC)
                   (limit 1)))))
