@@ -17,7 +17,7 @@
     (select message
             (where {:queue queue :id [> msg-id]})
             (limit page/page-size)
-            (order :id :ASC))))
+            (order :created :ASC :id :ASC))))
 
 (defn create
   [queue {:keys [producer body]}]
