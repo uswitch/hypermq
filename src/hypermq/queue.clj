@@ -9,5 +9,7 @@
   (select message
           (fields :queue :uuid)
           (aggregate (max :created) :last-modified)
-          (order :created)
-          (group :queue :desc)))
+          (group :queue)
+          ;; This order by is a fudge to get the uuid of the last message in
+          ;; each group (which is implicitly ordered by id)
+          (order :queue :desc)))
