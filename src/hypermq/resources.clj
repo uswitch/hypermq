@@ -39,7 +39,7 @@
 
 (defn- etag
   [context]
-  (-> context :items last :id))
+  (-> context :items last :uuid))
 
 (defn- last-modified
   [context]

@@ -22,27 +22,27 @@
 (fact "Should list messages on a queue from the beginning"
       (app (json-request :get "/q/myqueue")) => (contains {:status 200 :body (contains "uuid1")})
       (provided
-       (msg/fetch "myqueue" nil) => [{:id "uuid1"}]))
+       (msg/fetch "myqueue" nil) => [{:uuid "uuid1"}]))
 
 (fact "Should list messages on a queue from a known message id"
       (app (json-request :get "/q/fooqueue/uuid1")) => (contains {:status 200 :body (contains "uuid2")})
       (provided
-       (msg/fetch "fooqueue" "uuid1") => [{:id "uuid2"}]))
+       (msg/fetch "fooqueue" "uuid1") => [{:uuid "uuid2"}]))
 
 (fact "Should return etag same as id of last message on page"
       (app (json-request :get "/q/fooqueue")) => (contains {:headers (contains {"ETag" "\"id-of-last-msg\""})})
       (provided
-       (msg/fetch "fooqueue" nil) => [{:id "id-of-1st-msg"} {:id "id-of-last-msg"}]))
+       (msg/fetch "fooqueue" nil) => [{:uuid "id-of-1st-msg"} {:uuid "id-of-last-msg"}]))
 
 (fact "Should return last modified same as creation date of last message on page"
       (app (json-request :get "/q/fooqueue/uuid1")) => (contains {:headers (contains {"Last-Modified" "Sat, 03 May 2014 10:25:41 GMT"})})
       (provided
-       (msg/fetch "fooqueue" "uuid1") => [{:id "uuid2" :created 1000} {:id "uuid3" :created 1399112741000}]))
+       (msg/fetch "fooqueue" "uuid1") => [{:uuid "uuid2" :created 1000} {:uuid "uuid3" :created 1399112741000}]))
 
 (fact "Should return 304 when requested etag matches page"
       (app (json-request :get "/q/fooqueue/uuid1" :etag "uuid2")) => (contains {:status 304})
       (provided
-       (msg/fetch "fooqueue" "uuid1") => [{:id "uuid2"}]))
+       (msg/fetch "fooqueue" "uuid1") => [{:uuid "uuid2"}]))
 
 (fact "Should create acknowledgement for a client"
       (app (json-request :post "/ack/fooqueue/client1" :content "{\"id\":\"uuid2\"}")) => (contains {:status 201})
