@@ -7,6 +7,7 @@
 (defn latest
   []
   (select message
-          (fields :queue, :uuid)
+          (fields :queue :uuid)
           (aggregate (max :created) :last-modified)
-          (group :queue)))
+          (order :created)
+          (group :queue :desc)))
