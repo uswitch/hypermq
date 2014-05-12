@@ -24,7 +24,9 @@
            (fields :client :message)
            (aggregate (max :created) :last-modified)
            (where {:queue queue})
-           (group :client)))
+           (group :client)
+           ;; Fudge to get the last acknowledgement in each group
+           (order :client :desc)))
 
   ([queue client]
    (first (select acknowledgement
