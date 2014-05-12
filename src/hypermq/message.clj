@@ -7,22 +7,24 @@
             [hypermq.util :as util]))
 
 (defn get
-  [msg-id]
+  [msg-uuid]
   (first  (select message
-                  (where {:id msg-id}))))
+                  (where {:uuid msg-uuid}))))
 
 (defn fetch
   [queue last-seen]
-  (let [msg-id (or last-seen "")]
+  (let [uuid (or last-seen "")
+        msg-id (or (:id (get uuid)) 0)]
     (select message
+            (fields :uuid :queue :producer :created :body)
             (where {:queue queue :id [> msg-id]})
             (limit page/page-size)
-            (order :created :ASC :id :ASC))))
+            (order :id :ASC))))
 
 (defn create
   [queue {:keys [producer body]}]
   (insert message
-          (values {:id (uuid/generate)
+          (values {:uuid (uuid/generate)
                    :queue queue
                    :producer producer
                    :body body
