@@ -44,13 +44,13 @@
     [:li [:button {:type "button" :class (str  "btn btn-xs " (if up-to-date "btn-success" "btn-danger"))} client]]))
 
 (defn- queue-status
-  [{:keys [queue id last-modified]}]
+  [{:keys [queue uuid last-modified]}]
   [:li.col-md-3
    [:h4 queue]
    [:p (util/timestamp->str last-modified)]
-   [:p.text-muted [:small id]]
+   [:p.text-muted [:small uuid]]
    [:ul.list-inline
-    (map (partial acknowledgement id) (ack/latest queue))]])
+    (map (partial acknowledgement uuid) (ack/latest queue))]])
 
 (defn monitoring
   []

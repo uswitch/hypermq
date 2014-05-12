@@ -12,7 +12,7 @@ CREATE INDEX uuid_idx ON message (uuid);
 CREATE TABLE IF NOT EXISTS acknowledgement (
   queue varchar(255) NOT NULL,
   client VARCHAR(255) NOT NULL,
-  message BIGINT NOT NULL,
+  message VARCHAR(36) NOT NULL,
   created BIGINT NOT NULL,
   PRIMARY KEY (queue, client, message)
 );
