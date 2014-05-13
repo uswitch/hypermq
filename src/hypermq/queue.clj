@@ -7,9 +7,8 @@
 (defn latest
   []
   (select message
-          (fields :queue :uuid)
-          (aggregate (max :created) :last-modified)
-          (group :queue)
-          ;; This order by is a fudge to get the uuid of the last message in
-          ;; each group (which is implicitly ordered by id)
+          (fields :queue :uuid :created)
+          (where {:id [in (subselect message
+                                     (aggregate (max :id) :id)
+                                     (group :queue))]})
           (order :queue :desc)))

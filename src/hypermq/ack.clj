@@ -21,12 +21,15 @@
 (defn latest
   ([queue]
    (select acknowledgement
-           (fields :client :message)
-           (aggregate (max :created) :last-modified)
-           (where {:queue queue})
+           (fields [:acknowledgement.client :client]
+                   [:acknowledgement.message :message])
+           (join message (= :acknowledgement.message :message.uuid))
+           (where {:acknowledgement.queue queue
+                   :message.id [in (subselect message
+                                              (aggregate (max :id) :id)
+                                              (where {:queue queue}))]})
            (group :client)
-           ;; Fudge to get the last acknowledgement in each group
-           (order :client :desc)))
+           (order :client :asc)))
 
   ([queue client]
    (first (select acknowledgement
