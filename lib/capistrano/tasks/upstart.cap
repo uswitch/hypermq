@@ -1,0 +1,44 @@
+def build_cmd(service_name, action, sudo = false)
+  cmd = "service #{service_name} #{action}"
+  cmd = "sudo " + cmd if sudo
+  cmd
+end
+
+namespace :upstart do
+  desc "Start the application services"
+  task :start do
+    on roles(fetch(:upstart_roles)) do
+      execute build_cmd(fetch(:upstart_service), 'start', fetch(:upstart_sudo))
+    end
+  end
+
+  desc "Stop the application services"
+  task :stop do
+    on roles(fetch(:upstart_roles)) do
+      execute build_cmd(fetch(:upstart_service), 'stop', fetch(:upstart_sudo))
+    end
+  end
+
+  desc "Restart the application services"
+  task :restart do
+    on roles(fetch(:upstart_roles)) do
+      cmd_sq  = build_cmd(fetch(:upstart_service), 'start', fetch(:upstart_sudo))
+      cmd_sq += ' || '
+      cmd_sq += build_cmd(fetch(:upstart_service), 'restart', fetch(:upstart_sudo))
+
+      execute cmd_sq
+    end
+  end
+end
+
+namespace :load do
+  task :defaults do
+    set :upstart_service, -> { fetch(:application) }
+    set :upstart_sudo, false
+    set :upstart_roles, :commsinternal
+  end
+end
+
+namespace :deploy do
+  after :publishing, 'upstart:restart'
+end
