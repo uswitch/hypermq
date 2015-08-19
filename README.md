@@ -68,7 +68,7 @@ Each json message body looks as follows. All are optional (title, author, conten
 ### Example message creation
 
 ```bash
-curl -v -d '{"producer":"myproducer","bosy":{"some":"data"}}' -H "Content-Type:application/json" http://localhost/q/myqueue
+curl -v -d '{"producer":"myproducer","body":{"some":"data"}}' -H "Content-Type:application/json" http://localhost/q/myqueue
 ```
 
 ## Etags
@@ -81,9 +81,12 @@ ETAGs are used by providing the value in the If-None-Match header.
 curl -i -H 'Content-Type:application/json' -H 'If-None-Match:"ca9539ef-4763-4940-8565-e7699c1404da"' http://localhost/q/data
 ```
 
-## Acknowledgements
+## Acknowledgements (optional)
 
-After you have consumed a message, your client can acknowledge you have processed it by POSTing the message uuid to the Acknowledgement resource.
+After you have consumed a message, your client can acknowledge you have processed it by POSTing the message uuid to the Acknowledgement resource.  
+This is completely optional and the consumer can choose to remember where you are up to in the queue however you like, such as zookeeper for instance. 
+
+Using the built in acknowledgement system does have the advantage of making the hypermq monitoring page (see below) visualualy show which clients have consumed which queues and are upto date.
 
 ### Example Acknowledgement creation
 
@@ -96,3 +99,13 @@ curl -v -d '{"id":"ca9539ef-4763-4940-8565-e7699c1404da"}' -H "Content-Type:appl
 ```bash
 curl -v -H "Content-Type:application/json" http://localhost/ack/myqueue/myclient
 ```
+
+## Monitoring page
+
+Hypermq provides a simple monitoring endpoint `/monitoring` which will show all the queues and the UUID if the most recent message on those queues. It will also show a label for each consumer that has acknowledged messages on that queue.  
+
+The labels will be colour coded either:
+
+* green - meaning the consumer is upto date on the queue
+* red - meaning the consumer is not upto date on the queue
+
