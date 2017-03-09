@@ -1,0 +1,8 @@
+{:db
+  {:db "hypermq"
+   :user "hypermq"
+   :password "iamarestfulhypermediabasedmessagequeue"
+   :host "comms-internal-mysql.uswitchinternal.com"
+   :port 3306 }
+ :hostname "hypermq-new.uswitchinternal.com"}
+

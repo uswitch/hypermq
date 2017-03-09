@@ -1,0 +1,13 @@
+.ruby-*
+.git
+migrations
+*.sh
+docker-compose*
+node_modules
+logs
+Gemfile Gemfile.lock
+README.md
+todo.org
+/lib
+sql
+test

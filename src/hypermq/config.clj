@@ -1,5 +1,6 @@
 (ns hypermq.config
   (:require [clojure.tools.reader.edn :as edn]
+            [clojure.java.io          :as io]
             [bobby-conf.core          :as bc]))
 
 (bc/init :environments [:development :production])
@@ -9,7 +10,7 @@
 
 (def config
   (if (production?)
-    (edn/read-string (slurp "/opt/uswitch/hypermq/etc/hypermq-server.config"))
+    (-> "config/production.edn" io/resource slurp edn/read-string)
     dev-config))
 
 (def db

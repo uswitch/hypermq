@@ -1,0 +1,10 @@
+version: '2'
+services:
+  hypermq:
+    build: .
+    environment:
+      PORT: 8080
+      APP_ENV: production
+      JVM_OPTS: "-Xmx450m -Xms450m -server"
+    ports:
+      - "8080:8080"

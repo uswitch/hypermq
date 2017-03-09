@@ -1,0 +1,20 @@
+{
+  "family": "hypermq",
+  "containerDefinitions": [
+    {
+      "name": "hypermq",
+      "image": "docker-registry-v2.uswitchinternal.com/hypermq",
+      "cpu": 250,
+      "memory": 1000,
+      "essential": true,
+      "portMappings": [
+        { "containerPort": 8080 }
+      ],
+      "environment": [
+        { "name": "JAVA_OPTS", "value": "-Xms900m -Xmx900m -server" },
+        { "name": "PORT", "value": "8080" },
+        { "name": "APP_ENV", "value": "production" }
+      ]
+    }
+  ]
+}
