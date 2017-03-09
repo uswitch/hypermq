@@ -7,6 +7,7 @@
 
 (defroutes app-routes
   (GET  "/"                   []             (view/home))
+  (GET  "/health"             []             "OK")
   (GET  "/monitoring"         []             (view/monitoring))
 
   (GET  "/m/:msg-id"          {params :params} (resource/message params))

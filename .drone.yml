@@ -1,0 +1,17 @@
+publish:
+  app:
+    image: plugins/drone-docker
+    repo: docker-registry-v2.uswitchinternal.com/hypermq
+    storage_driver: overlay
+    tag:
+      - "$${COMMIT:8}"
+
+deploy:
+  live:
+    image: docker-registry-v2.uswitchinternal.com/drone/drone-plugin-ecs
+    region: eu-west-1
+    service_definition: ecs/service.json
+    task_definition: ecs/task-definition.json
+    container_overrides:
+      - name: hypermq
+        image: docker-registry-v2.uswitchinternal.com/hypermq:$${COMMIT:8}
