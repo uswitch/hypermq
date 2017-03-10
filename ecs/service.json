@@ -11,7 +11,7 @@
   ],
   "role": "arn:aws:iam::136393635417:role/role-broadband-ecs",
   "clientToken": "broadband-team",
-  "desiredCount": 1,
+  "desiredCount": 2,
   "deploymentConfiguration": {
     "maximumPercent": 200,
     "minimumHealthyPercent": 100
