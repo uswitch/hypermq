@@ -3,7 +3,7 @@
   "containerDefinitions": [
     {
       "name": "hypermq",
-      "image": "docker-registry-v2.uswitchinternal.com/hypermq",
+      "image": "registry.usw.co/hypermq:{{ printf "%.8s" .Env.DRONE_COMMIT }}",
       "cpu": 250,
       "memory": 1000,
       "essential": true,
